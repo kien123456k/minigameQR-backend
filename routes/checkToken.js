@@ -7,7 +7,7 @@ router.get('/:token', function (req, res, next) {
   result.findOne({token: token}, function (err, data) {
     if (!data) {
       const date = new Date();
-      return res.json({
+      res.status(404).json({
         success: false,
         message: 'Invalid token!',
         data: {
@@ -19,15 +19,15 @@ router.get('/:token', function (req, res, next) {
         },
       });
     } else if (!data.name) {
-      return res.json({
+      res.status(200).json({
         success: true,
-        isOwn: false,
+        available: true,
         message: 'This token is available for use',
       });
     } else {
-      return res.json({
+      res.status(200).json({
         success: true,
-        isOwn: true,
+        available: false,
         message: 'This token is not available!',
       });
     }
