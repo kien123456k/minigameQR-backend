@@ -5,9 +5,8 @@ const result = mongoose.Schema({
   name: String,
   studentID: String,
   score: Number,
-  timeStart: Date,
-  timeEnd: Date,
-  time: Number,
+  time: Date,
+  questions: Array, 
 });
 
 module.exports = mongoose.model('result', result);

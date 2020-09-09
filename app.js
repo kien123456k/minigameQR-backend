@@ -12,8 +12,8 @@ mongoose.connect('mongodb://localhost/minigame', {
   useCreateIndex: true,
 });
 
-const checkTokenRouter = require('./routes/checkToken');
-const registerRouter = require('./routes/register');
+const tokenRouter = require('./routes/token');
+const userRouter = require('./routes/user');
 
 const app = express();
 
@@ -27,8 +27,8 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/check', checkTokenRouter);
-app.use('/users', registerRouter);
+app.use('/', tokenRouter);
+app.use('/user', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
