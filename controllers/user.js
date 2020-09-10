@@ -13,7 +13,7 @@ module.exports = {
     result.findOne({token: token}, function (err, data) {
       if (!data) {
         const date = new Date();
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Invalid token!',
           data: {
@@ -25,8 +25,30 @@ module.exports = {
           },
         });
       } else if (!data.studentID) {
-        data.name = name;
-        data.studentID = studentID;
+        result.findOne({studentID: studentID}, (err, user) => {
+          if (user) {
+            const date = new Date();
+            res.status(403).json({
+              success: false,
+              message: 'This studentID has been used!',
+              data: {
+                code: 403,
+                timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+                path: `/users/register`,
+                method: 'POST',
+                message: 'Your student ID has been used with other token!',
+              },
+            });
+          } else {
+            data.name = name;
+            data.studentID = studentID;
+            data.save();
+            res.status(200).json({
+              success: true,
+              message: 'Register success!',
+            });
+          }
+        });
         data.save();
         res.status(200).json({
           success: true,
