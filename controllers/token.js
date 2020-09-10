@@ -1,9 +1,9 @@
-const result = require('../model/result');
+const user = require('../model/user');
 
 module.exports = {
   check: (req, res, next) => {
     const token = req.params.token;
-    result.findOne({token: token}, function (err, user) {
+    user.findOne({token: token}, function (err, user) {
       if (!user) {
         const date = new Date();
         res.status(404).json({

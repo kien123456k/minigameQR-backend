@@ -1,4 +1,4 @@
-const result = require('../model/result');
+const user = require('../model/user');
 const normalQuestion = require('../model/normalQuestion');
 const hardQuestion = require('../model/hardQuestion');
 
@@ -10,7 +10,7 @@ module.exports = {
     const token = req.body.token;
     const name = req.body.name;
     const studentID = req.body.studentID;
-    result.findOne({token: token}, function (err, user) {
+    user.findOne({token: token}, function (err, user) {
       if (!user) {
         const date = new Date();
         res.status(404).json({
@@ -25,7 +25,7 @@ module.exports = {
           },
         });
       } else if (!user.studentID) {
-        result.findOne({studentID: studentID}, (err, user) => {
+        user.findOne({studentID: studentID}, (err, user) => {
           if (user) {
             const date = new Date();
             res.status(403).json({
@@ -91,9 +91,10 @@ module.exports = {
       }
     });
   },
+
   start: (req, res, next) => {
     const token = req.params.token;
-    result.findOne({token: token}, function (err, user) {
+    user.findOne({token: token}, function (err, user) {
       if (!user) {
         const date = new Date();
         res.status(404).json({
@@ -112,29 +113,29 @@ module.exports = {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
-            data: data.questions,
+            data: user.questions,
           });
         } else {
-          const questions = [];
+          let questions = [];
           normalQuestion
             .aggregate()
             .sample(numberNormalQuestion)
             .exec((err, data) => {
-              questions.concat(data);
+              questions = questions.concat(data);
             });
           hardQuestion
             .aggregate()
             .sample(numberHardQuestion)
             .exec((err, data) => {
-              questions.concat(data);
+              questions = questions.concat(data);
+              user.questions = questions;
+              user.save();
+              res.status(200).json({
+                success: true,
+                message: 'Retrieved data successfully!',
+                data: questions,
+              });
             });
-          user.questions = questions;
-          user.save();
-          res.status(200).json({
-            success: true,
-            message: 'Retrieved data successfully!',
-            data: questions,
-          });
         }
       }
     });
