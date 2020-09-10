@@ -10,8 +10,8 @@ module.exports = {
     const token = req.body.token;
     const name = req.body.name;
     const studentID = req.body.studentID;
-    result.findOne({token: token}, function (err, data) {
-      if (!data) {
+    result.findOne({token: token}, function (err, user) {
+      if (!user) {
         const date = new Date();
         res.status(404).json({
           success: false,
@@ -24,7 +24,7 @@ module.exports = {
             message: 'The token you requested is not found',
           },
         });
-      } else if (!data.studentID) {
+      } else if (!user.studentID) {
         result.findOne({studentID: studentID}, (err, user) => {
           if (user) {
             const date = new Date();
@@ -40,22 +40,21 @@ module.exports = {
               },
             });
           } else {
-            data.name = name;
-            data.studentID = studentID;
-            data.save();
+            user.name = name;
+            user.studentID = studentID;
+            user.save();
             res.status(200).json({
               success: true,
               message: 'Register success!',
             });
           }
         });
-        data.save();
         res.status(200).json({
           success: true,
           message: 'Register success!',
         });
       } else {
-        if (data.studentID !== studentID) {
+        if (user.studentID !== studentID) {
           const date = new Date();
           res.status(403).json({
             success: false,
@@ -69,7 +68,7 @@ module.exports = {
             },
           });
         } else {
-          if (data.name !== name) {
+          if (user.name !== name) {
             const date = new Date();
             res.status(403).json({
               success: false,
@@ -94,8 +93,8 @@ module.exports = {
   },
   start: (req, res, next) => {
     const token = req.params.token;
-    result.findOne({token: token}, function (err, data) {
-      if (!data) {
+    result.findOne({token: token}, function (err, user) {
+      if (!user) {
         const date = new Date();
         res.status(404).json({
           success: false,
@@ -109,7 +108,7 @@ module.exports = {
           },
         });
       } else {
-        if (data.questions.length) {
+        if (user.questions.length) {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
@@ -129,8 +128,8 @@ module.exports = {
             .exec((err, data) => {
               questions.concat(data);
             });
-          data.questions = questions;
-          data.save();
+          user.questions = questions;
+          user.save();
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
