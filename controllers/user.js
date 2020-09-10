@@ -1,4 +1,4 @@
-const result = require('../model/result');
+const user = require('../model/user');
 const normalQuestion = require('../model/normalQuestion');
 const hardQuestion = require('../model/hardQuestion');
 
@@ -10,10 +10,10 @@ module.exports = {
     const token = req.body.token;
     const name = req.body.name;
     const studentID = req.body.studentID;
-    result.findOne({token: token}, function (err, data) {
-      if (!data) {
+    user.findOne({token: token}, function (err, user) {
+      if (!user) {
         const date = new Date();
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: 'Invalid token!',
           data: {
@@ -24,16 +24,37 @@ module.exports = {
             message: 'The token you requested is not found',
           },
         });
-      } else if (!data.studentID) {
-        data.name = name;
-        data.studentID = studentID;
-        data.save();
+      } else if (!user.studentID) {
+        user.findOne({studentID: studentID}, (err, user) => {
+          if (user) {
+            const date = new Date();
+            res.status(403).json({
+              success: false,
+              message: 'This studentID has been used!',
+              data: {
+                code: 403,
+                timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+                path: `/users/register`,
+                method: 'POST',
+                message: 'Your student ID has been used with other token!',
+              },
+            });
+          } else {
+            user.name = name;
+            user.studentID = studentID;
+            user.save();
+            res.status(200).json({
+              success: true,
+              message: 'Register success!',
+            });
+          }
+        });
         res.status(200).json({
           success: true,
           message: 'Register success!',
         });
       } else {
-        if (data.studentID !== studentID) {
+        if (user.studentID !== studentID) {
           const date = new Date();
           res.status(403).json({
             success: false,
@@ -47,7 +68,7 @@ module.exports = {
             },
           });
         } else {
-          if (data.name !== name) {
+          if (user.name !== name) {
             const date = new Date();
             res.status(403).json({
               success: false,
@@ -70,10 +91,11 @@ module.exports = {
       }
     });
   },
+
   start: (req, res, next) => {
     const token = req.params.token;
-    result.findOne({token: token}, function (err, data) {
-      if (!data) {
+    user.findOne({token: token}, function (err, user) {
+      if (!user) {
         const date = new Date();
         res.status(404).json({
           success: false,
@@ -87,33 +109,33 @@ module.exports = {
           },
         });
       } else {
-        if (data.questions.length) {
+        if (user.questions.length) {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
-            data: data.questions,
+            data: user.questions,
           });
         } else {
-          const questions = [];
+          let questions = [];
           normalQuestion
             .aggregate()
             .sample(numberNormalQuestion)
             .exec((err, data) => {
-              questions.concat(data);
+              questions = questions.concat(data);
             });
           hardQuestion
             .aggregate()
             .sample(numberHardQuestion)
             .exec((err, data) => {
-              questions.concat(data);
+              questions = questions.concat(data);
+              user.questions = questions;
+              user.save();
+              res.status(200).json({
+                success: true,
+                message: 'Retrieved data successfully!',
+                data: questions,
+              });
             });
-          data.questions = questions;
-          data.save();
-          res.status(200).json({
-            success: true,
-            message: 'Retrieved data successfully!',
-            data: questions,
-          });
         }
       }
     });
