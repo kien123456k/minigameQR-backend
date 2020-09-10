@@ -120,12 +120,14 @@ module.exports = {
           normalQuestion
             .aggregate()
             .sample(numberNormalQuestion)
+            .project('question multipleChoice -_id')
             .exec((err, data) => {
               questions = questions.concat(data);
             });
           hardQuestion
             .aggregate()
             .sample(numberHardQuestion)
+            .project('question multipleChoice -_id')
             .exec((err, data) => {
               questions = questions.concat(data);
               user.questions = questions;
