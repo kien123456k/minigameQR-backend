@@ -5,11 +5,20 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 require('dotenv').config();
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/minigame', {
+mongoose.connect('mongodb://127.0.0.1:27017/minigame', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
   useCreateIndex: true,
+});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', async function() {
+  console.log(`connected`)
+  //test
+  const normalQuestion = require('./model/normalQuestion');
+  await normalQuestion.create({question:'How to be a billionaire', multipleChoice:[1,2,3,4], an});
+  //
 });
 
 const tokenRouter = require('./routes/token');
