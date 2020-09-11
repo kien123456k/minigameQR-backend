@@ -10,8 +10,8 @@ module.exports = {
     const token = req.body.token;
     const name = req.body.name;
     const studentID = req.body.studentID;
-    user.findOne({token: token}, function (err, user) {
-      if (!user) {
+    user.findOne({token: token}, function (err, student1) {
+      if (!student1) {
         const date = new Date();
         res.status(404).json({
           success: false,
@@ -24,9 +24,9 @@ module.exports = {
             message: 'The token you requested is not found',
           },
         });
-      } else if (!user.studentID) {
-        user.findOne({studentID: studentID}, (err, user) => {
-          if (user) {
+      } else if (!student1.studentID) {
+        user.findOne({studentID: studentID}, (err, student2) => {
+          if (student2) {
             const date = new Date();
             res.status(403).json({
               success: false,
@@ -40,21 +40,17 @@ module.exports = {
               },
             });
           } else {
-            user.name = name;
-            user.studentID = studentID;
-            user.save();
+            student1.name = name;
+            student1.studentID = studentID;
+            student1.save();
             res.status(200).json({
               success: true,
               message: 'Register success!',
             });
           }
         });
-        res.status(200).json({
-          success: true,
-          message: 'Register success!',
-        });
       } else {
-        if (user.studentID !== studentID) {
+        if (student1.studentID !== studentID) {
           const date = new Date();
           res.status(403).json({
             success: false,
@@ -68,7 +64,7 @@ module.exports = {
             },
           });
         } else {
-          if (user.name !== name) {
+          if (student1.name !== name) {
             const date = new Date();
             res.status(403).json({
               success: false,
@@ -94,8 +90,8 @@ module.exports = {
 
   start: (req, res, next) => {
     const token = req.params.token;
-    user.findOne({token: token}, function (err, user) {
-      if (!user) {
+    user.findOne({token: token}, function (err, student) {
+      if (!student) {
         const date = new Date();
         res.status(404).json({
           success: false,
@@ -109,35 +105,40 @@ module.exports = {
           },
         });
       } else {
-        if (user.questions.length) {
+        if (student.timeStart) {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
             data: user.questions,
           });
         } else {
-          let questions = [];
-          normalQuestion
-            .aggregate()
-            .sample(numberNormalQuestion)
-            .project('question multipleChoice -_id')
-            .exec((err, data) => {
-              questions = questions.concat(data);
-            });
-          hardQuestion
-            .aggregate()
-            .sample(numberHardQuestion)
-            .project('question multipleChoice -_id')
-            .exec((err, data) => {
-              questions = questions.concat(data);
-              user.questions = questions;
-              user.save();
-              res.status(200).json({
-                success: true,
-                message: 'Retrieved data successfully!',
-                data: questions,
+          let quizs = [];
+          const getQuestions = async () => {
+            await normalQuestion
+              .aggregate()
+              .sample(numberNormalQuestion)
+              .project('question multipleChoice -_id')
+              .exec((err, data) => {
+                quizs = quizs.concat(data);
               });
-            });
+            await hardQuestion
+              .aggregate()
+              .sample(numberHardQuestion)
+              .project('question multipleChoice -_id')
+              .exec((err, data) => {
+                const date = new Date();
+                quizs = quizs.concat(data);
+                student.questions = quizs;
+                student.timeStart = date.getTime();
+                student.save();
+                res.status(200).json({
+                  success: true,
+                  message: 'Retrieved data successfully!',
+                  data: quizs,
+                });
+              });
+          };
+          getQuestions();
         }
       }
     });
