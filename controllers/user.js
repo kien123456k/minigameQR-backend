@@ -109,7 +109,7 @@ module.exports = {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
-            data: user.questions,
+            data: student.questions,
           });
         } else {
           let quizs = [];
@@ -117,20 +117,22 @@ module.exports = {
             await normalQuestion
               .aggregate()
               .sample(numberNormalQuestion)
-              .project('question multipleChoice -_id')
               .exec((err, data) => {
                 quizs = quizs.concat(data);
               });
             await hardQuestion
               .aggregate()
               .sample(numberHardQuestion)
-              .project('question multipleChoice -_id')
-              .exec((err, data) => {
-                const date = new Date();
+              .exec(async (err, data) => {
                 quizs = quizs.concat(data);
+                console.log(quizs[0]);
                 student.questions = quizs;
-                student.timeStart = date.getTime();
-                student.save();
+                student.timeStart = Date.now();
+                await student.save();
+                for (let i of quizs) {
+                  delete i.answer;
+                }
+                console.log(quizs[0]);
                 res.status(200).json({
                   success: true,
                   message: 'Retrieved data successfully!',
@@ -139,6 +141,72 @@ module.exports = {
               });
           };
           getQuestions();
+        }
+      }
+    });
+  },
+
+  end: (req, res, next) => {
+    const token = req.body.token;
+    const name = req.body.name;
+    const studentID = req.body.studentID;
+    const answer = req.body.answer;
+    user.findOne({token: token, name: name, studentID: studentID}, (err, student) => {
+      if (!student) {
+        const date = new Date();
+        res.status(404).json({
+          success: false,
+          message: 'User is not exist!',
+          data: {
+            code: 404,
+            timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+            path: '/end',
+            method: 'POST',
+            message: 'User you request is not exist',
+          },
+        });
+      } else {
+        if (!student.timeStart) {
+          const date = new Date();
+          res.status(403).json({
+            success: false,
+            message: 'User is not start the game!',
+            data: {
+              code: 403,
+              timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+              path: '/end',
+              method: 'POST',
+              message: 'User you request is not start the game',
+            },
+          });
+        } else {
+          if (student.timeEnd) {
+            const date = new Date();
+            res.status(403).json({
+              success: false,
+              message: 'User already finished the game!',
+              data: {
+                code: 403,
+                timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+                path: '/end',
+                method: 'POST',
+                message: 'User you request already finished the game',
+              },
+            });
+          } else {
+            student.timeEnd = Date.now();
+            let score = 0;
+            for (let i in answer) {
+              if (answer[i] === student.questions[i].answer) score++;
+            }
+            student.score = score;
+            student.time = student.timeEnd - student.timeStart;
+            student.save();
+            res.status(200).json({
+              success: true,
+              message: 'Submit successfully!',
+            });
+          }
         }
       }
     });
