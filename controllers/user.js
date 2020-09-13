@@ -109,7 +109,10 @@ module.exports = {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
-            data: student.questions,
+            data: {
+              questions: student.questions,
+              message: 'Retrieved data successfully from database',
+            },
           });
         } else {
           let quizs = [];
@@ -130,10 +133,13 @@ module.exports = {
                   delete i.answer;
                 }
                 res.status(200).json({
-                    success: true,
-                    message: 'Retrieved data successfully!',
-                    data: quizs,
-                  });
+                  success: true,
+                  message: 'Retrieved data successfully!',
+                  data: {
+                    questions: student.questions,
+                    message: 'Retrieved data successfully after generating',
+                  },
+                });
               });
         }
       }
