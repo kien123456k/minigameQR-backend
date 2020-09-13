@@ -113,34 +113,28 @@ module.exports = {
           });
         } else {
           let quizs = [];
-          const getQuestions = async () => {
-            await normalQuestion
+          let p1 =   normalQuestion
               .aggregate()
               .sample(numberNormalQuestion)
-              .exec((err, data) => {
-                quizs = quizs.concat(data);
-              });
-            await hardQuestion
+          let p2 = hardQuestion
               .aggregate()
               .sample(numberHardQuestion)
-              .exec(async (err, data) => {
-                quizs = quizs.concat(data);
-                console.log(quizs[0]);
+          Promise.all([p1,p2])
+              .then(async (values) => {
+                quizs = quizs.concat(values[0]);
+                quizs = quizs.concat(values[1]);
                 student.questions = quizs;
                 student.timeStart = Date.now();
                 await student.save();
                 for (let i of quizs) {
                   delete i.answer;
                 }
-                console.log(quizs[0]);
                 res.status(200).json({
-                  success: true,
-                  message: 'Retrieved data successfully!',
-                  data: quizs,
-                });
+                    success: true,
+                    message: 'Retrieved data successfully!',
+                    data: quizs,
+                  });
               });
-          };
-          getQuestions();
         }
       }
     });
