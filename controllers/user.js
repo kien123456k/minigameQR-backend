@@ -90,18 +90,23 @@ module.exports = {
 
   start: (req, res, next) => {
     const token = req.params.token;
-    user.findOne({token: token}, function (err, student) {
+    const studentID = req.params.studentID;
+    const name = req.params.name;
+    user.findOne({token: token, studentID: studentID, name: name}, function (
+      err,
+      student
+    ) {
       if (!student) {
         const date = new Date();
         res.status(404).json({
           success: false,
-          message: 'Invalid token!',
+          message: 'Invalid user!',
           data: {
             code: 404,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
-            path: `/start/${token}`,
+            path: `/start/${token}/${studentID}/${name}`,
             method: 'GET',
-            message: 'The token you requested is not found',
+            message: 'User is not found',
           },
         });
       } else {
@@ -111,36 +116,33 @@ module.exports = {
             message: 'Retrieved data successfully!',
             data: {
               questions: student.questions,
+              timeStart: student.timeStart,
               message: 'Retrieved data successfully from database',
             },
           });
         } else {
           let quizs = [];
-          let p1 =   normalQuestion
-              .aggregate()
-              .sample(numberNormalQuestion)
-          let p2 = hardQuestion
-              .aggregate()
-              .sample(numberHardQuestion)
-          Promise.all([p1,p2])
-              .then(async (values) => {
-                quizs = quizs.concat(values[0]);
-                quizs = quizs.concat(values[1]);
-                student.questions = quizs;
-                student.timeStart = Date.now();
-                await student.save();
-                for (let i of quizs) {
-                  delete i.answer;
-                }
-                res.status(200).json({
-                  success: true,
-                  message: 'Retrieved data successfully!',
-                  data: {
-                    questions: student.questions,
-                    message: 'Retrieved data successfully after generating',
-                  },
-                });
-              });
+          let p1 = normalQuestion.aggregate().sample(numberNormalQuestion);
+          let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
+          Promise.all([p1, p2]).then(async (values) => {
+            quizs = quizs.concat(values[0]);
+            quizs = quizs.concat(values[1]);
+            student.questions = quizs;
+            student.timeStart = Date.now();
+            await student.save();
+            for (let i of quizs) {
+              delete i.answer;
+            }
+            res.status(200).json({
+              success: true,
+              message: 'Retrieved data successfully!',
+              data: {
+                questions: student.questions,
+                timeStart: student.timeStart,
+                message: 'Retrieved data successfully after generating',
+              },
+            });
+          });
         }
       }
     });
