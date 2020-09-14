@@ -50,7 +50,7 @@ module.exports = {
           }
         });
       } else {
-        if (student1.studentID !== studentID) {
+        if (student1.studentID.toLowerCase() !== studentID.toLowerCase()) {
           const date = new Date();
           res.status(403).json({
             success: false,
@@ -64,7 +64,7 @@ module.exports = {
             },
           });
         } else {
-          if (student1.name !== name) {
+          if (student1.name.toLowerCase() !== name.toLowerCase()) {
             const date = new Date();
             res.status(403).json({
               success: false,
@@ -89,9 +89,9 @@ module.exports = {
   },
 
   start: (req, res, next) => {
-    const token = req.params.token;
-    const studentID = req.params.studentID;
-    const name = req.params.name;
+    const token = req.query.token;
+    const studentID = req.query.studentID;
+    const name = req.query.name;
     user.findOne({token: token, studentID: studentID, name: name}, function (
       err,
       student
@@ -106,7 +106,7 @@ module.exports = {
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: `/start/${token}/${studentID}/${name}`,
             method: 'GET',
-            message: 'User is not found',
+            message: 'User you request is not found',
           },
         });
       } else {
@@ -158,13 +158,13 @@ module.exports = {
         const date = new Date();
         res.status(404).json({
           success: false,
-          message: 'User is not exist!',
+          message: 'User is invalid!',
           data: {
             code: 404,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: '/end',
             method: 'POST',
-            message: 'User you request is not exist',
+            message: 'User you request is not found',
           },
         });
       } else {
