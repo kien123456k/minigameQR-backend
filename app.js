@@ -13,8 +13,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/minigame', {
   useCreateIndex: true,
 });
 
-app.use(cors());
-
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', async function () {
@@ -25,6 +23,7 @@ const tokenRouter = require('./routes/token');
 const userRouter = require('./routes/user');
 
 const app = express();
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());
