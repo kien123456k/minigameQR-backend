@@ -3,19 +3,23 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+var cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
+
 mongoose.connect('mongodb://127.0.0.1:27017/minigame', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
   useCreateIndex: true,
 });
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', async function() {
-  console.log(`connected`)
+db.once('open', async function () {
+  console.log(`connected`);
 });
+app.use(cors());
 
 const tokenRouter = require('./routes/token');
 const userRouter = require('./routes/user');
