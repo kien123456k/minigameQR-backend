@@ -50,7 +50,7 @@ module.exports = {
           }
         });
       } else {
-        if (student1.studentID !== studentID) {
+        if (student1.studentID.toLowerCase() !== studentID.toLowerCase()) {
           const date = new Date();
           res.status(403).json({
             success: false,
@@ -64,7 +64,7 @@ module.exports = {
             },
           });
         } else {
-          if (student1.name !== name) {
+          if (student1.name.toLowerCase() !== name.toLowerCase()) {
             const date = new Date();
             res.status(403).json({
               success: false,
@@ -89,19 +89,24 @@ module.exports = {
   },
 
   start: (req, res, next) => {
-    const token = req.params.token;
-    user.findOne({token: token}, function (err, student) {
+    const token = req.query.token;
+    const studentID = req.query.studentID;
+    const name = req.query.name;
+    user.findOne({token: token, studentID: studentID, name: name}, function (
+      err,
+      student
+    ) {
       if (!student) {
         const date = new Date();
         res.status(404).json({
           success: false,
-          message: 'Invalid token!',
+          message: 'Invalid user!',
           data: {
             code: 404,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
-            path: `/start/${token}`,
+            path: `/start/${token}/${studentID}/${name}`,
             method: 'GET',
-            message: 'The token you requested is not found',
+            message: 'User you request is not found',
           },
         });
       } else {
@@ -109,38 +114,35 @@ module.exports = {
           res.status(200).json({
             success: true,
             message: 'Retrieved data successfully!',
-            data: student.questions,
+            data: {
+              questions: student.questions,
+              timeStart: student.timeStart,
+              message: 'Retrieved data successfully from database',
+            },
           });
         } else {
           let quizs = [];
-          const getQuestions = async () => {
-            await normalQuestion
-              .aggregate()
-              .sample(numberNormalQuestion)
-              .exec((err, data) => {
-                quizs = quizs.concat(data);
-              });
-            await hardQuestion
-              .aggregate()
-              .sample(numberHardQuestion)
-              .exec(async (err, data) => {
-                quizs = quizs.concat(data);
-                console.log(quizs[0]);
-                student.questions = quizs;
-                student.timeStart = Date.now();
-                await student.save();
-                for (let i of quizs) {
-                  delete i.answer;
-                }
-                console.log(quizs[0]);
-                res.status(200).json({
-                  success: true,
-                  message: 'Retrieved data successfully!',
-                  data: quizs,
-                });
-              });
-          };
-          getQuestions();
+          let p1 = normalQuestion.aggregate().sample(numberNormalQuestion);
+          let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
+          Promise.all([p1, p2]).then(async (values) => {
+            quizs = quizs.concat(values[0]);
+            quizs = quizs.concat(values[1]);
+            student.questions = quizs;
+            student.timeStart = Date.now();
+            await student.save();
+            for (let i of quizs) {
+              delete i.answer;
+            }
+            res.status(200).json({
+              success: true,
+              message: 'Retrieved data successfully!',
+              data: {
+                questions: student.questions,
+                timeStart: student.timeStart,
+                message: 'Retrieved data successfully after generating',
+              },
+            });
+          });
         }
       }
     });
@@ -156,13 +158,13 @@ module.exports = {
         const date = new Date();
         res.status(404).json({
           success: false,
-          message: 'User is not exist!',
+          message: 'User is invalid!',
           data: {
             code: 404,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: '/end',
             method: 'POST',
-            message: 'User you request is not exist',
+            message: 'User you request is not found',
           },
         });
       } else {
