@@ -1,7 +1,6 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 var cors = require('cors');
 require('dotenv').config();
@@ -14,27 +13,22 @@ mongoose.connect('mongodb://127.0.0.1:27017/minigame', {
   useCreateIndex: true,
 });
 
+app.use(cors());
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', async function () {
   console.log(`connected`);
 });
-app.use(cors());
 
 const tokenRouter = require('./routes/token');
 const userRouter = require('./routes/user');
 
 const app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
-// app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', tokenRouter);
 app.use('/user', userRouter);
