@@ -111,6 +111,7 @@ module.exports = {
         });
       } else {
         if (student.timeEnd) {
+          const date = new Date();
           res.status(403).json({
             success: false,
             message: 'User already submitted!',
