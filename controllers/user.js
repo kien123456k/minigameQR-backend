@@ -110,39 +110,53 @@ module.exports = {
           },
         });
       } else {
-        if (student.timeStart) {
-          res.status(200).json({
-            success: true,
-            message: 'Retrieved data successfully!',
+        if (student.timeEnd) {
+          res.status(403).json({
+            success: false,
+            message: 'User already submitted!',
             data: {
-              questions: student.questions,
-              timeStart: student.timeStart,
-              message: 'Retrieved data successfully from database',
+              code: 403,
+              timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+              path: `/start?token=${token}&studentID=${studentID}&name=${name}`,
+              method: 'GET',
+              message: 'User you request already submitted',
             },
           });
         } else {
-          let quizs = [];
-          let p1 = normalQuestion.aggregate().sample(numberNormalQuestion);
-          let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
-          Promise.all([p1, p2]).then(async (values) => {
-            quizs = quizs.concat(values[0]);
-            quizs = quizs.concat(values[1]);
-            student.questions = quizs;
-            student.timeStart = Date.now();
-            await student.save();
-            for (let i of quizs) {
-              delete i.answer;
-            }
+          if (student.timeStart) {
             res.status(200).json({
               success: true,
               message: 'Retrieved data successfully!',
               data: {
                 questions: student.questions,
                 timeStart: student.timeStart,
-                message: 'Retrieved data successfully after generating',
+                message: 'Retrieved data successfully from database',
               },
             });
-          });
+          } else {
+            let quizs = [];
+            let p1 = normalQuestion.aggregate().sample(numberNormalQuestion);
+            let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
+            Promise.all([p1, p2]).then(async (values) => {
+              quizs = quizs.concat(values[0]);
+              quizs = quizs.concat(values[1]);
+              student.questions = quizs;
+              student.timeStart = Date.now();
+              await student.save();
+              for (let i of quizs) {
+                delete i.answer;
+              }
+              res.status(200).json({
+                success: true,
+                message: 'Retrieved data successfully!',
+                data: {
+                  questions: student.questions,
+                  timeStart: student.timeStart,
+                  message: 'Retrieved data successfully after generating',
+                },
+              });
+            });
+          }
         }
       }
     });
