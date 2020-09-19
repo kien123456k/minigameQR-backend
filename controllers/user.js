@@ -13,11 +13,11 @@ module.exports = {
     user.findOne({token: token}, function (err, student1) {
       if (!student1) {
         const date = new Date();
-        res.status(404).json({
+        res.status(403).json({
           success: false,
           message: 'Invalid token!',
           data: {
-            code: 404,
+            code: 403,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: `/users/register`,
             method: 'POST',
@@ -98,11 +98,11 @@ module.exports = {
     ) {
       if (!student) {
         const date = new Date();
-        res.status(404).json({
+        res.status(403).json({
           success: false,
           message: 'Invalid user!',
           data: {
-            code: 404,
+            code: 403,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: `/start/${token}/${studentID}/${name}`,
             method: 'GET',
@@ -171,11 +171,11 @@ module.exports = {
     user.findOne({token: token, name: name, studentID: studentID}, (err, student) => {
       if (!student) {
         const date = new Date();
-        res.status(404).json({
+        res.status(403).json({
           success: false,
           message: 'User is invalid!',
           data: {
-            code: 404,
+            code: 403,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: '/end',
             method: 'POST',
