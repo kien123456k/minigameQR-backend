@@ -41,7 +41,7 @@ module.exports = {
             });
           } else {
             student1.name = name;
-            student1.studentID = studentID;
+            student1.studentID = studentID.toUpperCase();
             student1.save();
             res.status(200).json({
               success: true,
