@@ -6,7 +6,7 @@ var cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/minigame', {
+mongoose.connect('mongodb+srv://fcode:suprlBrlI5e4njCu@cluster0.pihma.mongodb.net/minigame?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
@@ -47,5 +47,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.send('error');
 });
-
+//fcode - suprlBrlI5e4njCu 
 module.exports = app;
