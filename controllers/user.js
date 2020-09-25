@@ -172,7 +172,7 @@ module.exports = {
           success: false,
           message: 'User is invalid!',
           data: {
-            code: 403,
+            code: 400,
             timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
             path: '/end',
             method: 'POST',
@@ -208,20 +208,58 @@ module.exports = {
               },
             });
           } else {
-            student.timeEnd = Date.now();
-            let score = 0;
-            for (let i in answer) {
-              if (answer[i] === student.questions[i].answer) score++;
-            }
-            student.score = score;
-            student.time = student.timeEnd - student.timeStart;
-            student.save();
-            res.status(200).json({
-              success: true,
-              message: 'Submit successfully!',
-            });
+            const submit = async () => {
+              student.timeEnd = Date.now();
+              let score = 0;
+              for (let i in answer) {
+                if (answer[i] === student.questions[i].answer) score++;
+              }
+              student.score = score;
+              student.time = student.timeEnd - student.timeStart;
+              await student.save();
+              res.status(200).json({
+                success: true,
+                message: 'Submit successfully!',
+              });
+            };
+            submit();
           }
         }
+      }
+    });
+  },
+
+  resetToken: (req, res, next) => {
+    const token = req.query.token;
+    user.findOne({token: token}, (err, student) => {
+      if (!student) {
+        const date = new Date();
+        res.status(400).json({
+          success: false,
+          message: 'User is invalid!',
+          data: {
+            code: 400,
+            timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+            path: `/user/reset/?token=${token}`,
+            method: 'GET',
+            message: 'User you request is not found',
+          },
+        });
+      } else {
+        const reset = async () => {
+          student.name = '';
+          student.studentID = '';
+          student.score = 0;
+          student.timeStart = 0;
+          student.timeEnd = 0;
+          student.time = 0;
+          await student.save();
+          res.status(200).json({
+            success: true,
+            message: 'Reset token successfully',
+          });
+        };
+        reset();
       }
     });
   },

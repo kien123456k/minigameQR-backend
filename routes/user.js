@@ -8,4 +8,6 @@ router.get('/start', user_controller.start);
 
 router.post('/end', user_controller.end);
 
+router.get('/reset', user_controller.resetToken);
+
 module.exports = router;
