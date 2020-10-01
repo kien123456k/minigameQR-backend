@@ -2,8 +2,8 @@ const user = require('../model/user');
 const normalQuestion = require('../model/normalQuestion');
 const hardQuestion = require('../model/hardQuestion');
 
-const numberHardQuestion = 4;
-const numberNormalQuestion = 6;
+const numberHardQuestion = 5;
+const numberNormalQuestion = 5;
 
 module.exports = {
   register: (req, res, next) => {
