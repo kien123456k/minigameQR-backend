@@ -136,9 +136,9 @@ module.exports = {
           } else {
             let quizs = [];
             let p1 = normalQuestion.aggregate().sample(numberNormalQuestion);
-            let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
             let p3 = mediumQuestion.aggregate().sample(numberMediumQuestion);
-            Promise.all([p1, p2, p3]).then(async (values) => {
+            let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
+            Promise.all([p1, p3, p2]).then(async (values) => {
               quizs = quizs.concat(values[0]);
               quizs = quizs.concat(values[1]);
               quizs = quizs.concat(values[2]);
