@@ -32,10 +32,11 @@ module.exports = {
       }
     });
   },
-  test: (req, res, next) => {
+  test: async (req, res, next) => {
     const token = req.params.token;
-    user.findOne({token: token}, function (err, user) {
-        res.send('ok');
-    });
+    const _user = await user.findOne({token: token});
+    if (!_user)
+        res.send('Not found');
+    else res.send('Ok');
   }
 };
