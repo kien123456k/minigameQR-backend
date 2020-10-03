@@ -124,11 +124,15 @@ module.exports = {
           });
         } else {
           if (student.timeStart) {
+            let quizs = student.questions;
+            for (let i of quizs) {
+              delete i.answer;
+            }
             res.status(200).json({
               success: true,
               message: 'Retrieved data successfully!',
               data: {
-                questions: student.questions,
+                questions: quizs,
                 timeStart: student.timeStart,
                 message: 'Retrieved data successfully from database',
               },
