@@ -29,11 +29,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-app.use('/', express.static('public'));
+// app.use('/', express.static('public'));
 app.use('/api', apiRouter);
-app.all('/*', function(req, res) {
-    res.sendFile('index.html', {root: publicFolder});
-});
+// app.all('/*', function(req, res) {
+//     res.sendFile('index.html', {root: publicFolder});
+// });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404, 'Not found'));

@@ -32,4 +32,10 @@ module.exports = {
       }
     });
   },
+  test: (req, res, next) => {
+    const token = req.params.token;
+    user.findOne({token: token}, function (err, user) {
+        res.send('ok');
+    });
+  }
 };
