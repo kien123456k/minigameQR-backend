@@ -10,6 +10,7 @@ const user = mongoose.Schema(
     timeEnd: Number,
     time: Number,
     questions: Array,
+    myAnswers: Array,
   },
   {collection: 'users'}
 );

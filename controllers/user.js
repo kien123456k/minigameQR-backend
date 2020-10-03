@@ -222,6 +222,7 @@ module.exports = {
               for (let i in answer) {
                 if (answer[i] === student.questions[i].answer) score++;
               }
+              student.myAnswers = answer;
               student.score = score;
               student.time = student.timeEnd - student.timeStart;
               await student.save();
