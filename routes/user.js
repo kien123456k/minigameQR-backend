@@ -9,6 +9,6 @@ router.get('/start', user_controller.start);
 // router.get('/register', (req,res, next) => res.send("ok"));
 router.post('/end', user_controller.end);
 
-router.get('/reset', user_controller.resetToken);
+// router.get('/reset', user_controller.resetToken);
 
 module.exports = router;
