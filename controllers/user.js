@@ -1,9 +1,11 @@
 const user = require('../model/user');
 const normalQuestion = require('../model/normalQuestion');
+const mediumQuestion = require('../model/mediumQuestion');
 const hardQuestion = require('../model/hardQuestion');
 
-const numberHardQuestion = 5;
-const numberNormalQuestion = 5;
+const numberHardQuestion = 2;
+const numberMediumQuestion = 4;
+const numberNormalQuestion = 4;
 
 module.exports = {
   register: (req, res, next) => {
@@ -135,9 +137,11 @@ module.exports = {
             let quizs = [];
             let p1 = normalQuestion.aggregate().sample(numberNormalQuestion);
             let p2 = hardQuestion.aggregate().sample(numberHardQuestion);
-            Promise.all([p1, p2]).then(async (values) => {
+            let p3 = mediumQuestion.aggregate().sample(numberMediumQuestion);
+            Promise.all([p1, p2, p3]).then(async (values) => {
               quizs = quizs.concat(values[0]);
               quizs = quizs.concat(values[1]);
+              quizs = quizs.concat(values[2]);
               student.questions = quizs;
               student.timeStart = Date.now();
               await student.save();
