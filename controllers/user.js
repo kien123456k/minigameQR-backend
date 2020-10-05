@@ -272,4 +272,19 @@ module.exports = {
       }
     });
   },
+
+  getUsers: (req, res, next) => {
+    user
+      .aggregate()
+      .sort({score: 'desc', time: 'asc'})
+      .then((users) => {
+        res.status(200).json({
+          success: true,
+          data: {
+            user: users,
+          },
+        });
+      })
+      .catch((err) => res.status(500).json(err));
+  },
 };
