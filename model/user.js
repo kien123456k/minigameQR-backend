@@ -11,6 +11,7 @@ const user = mongoose.Schema(
     time: Number,
     questions: Array,
     myAnswers: Array,
+    rank: Number,
   },
   {collection: 'users'}
 );

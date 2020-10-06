@@ -277,7 +277,11 @@ module.exports = {
     user
       .aggregate()
       .sort({score: 'desc', time: 'asc'})
-      .then((users) => {
+      .then(async (users) => {
+        for (let i = 1; i <= users.length; i++) {
+          users[i - 1].rank = i;
+          await users[i - 1].save();
+        }
         res.status(200).json({
           success: true,
           data: {
@@ -286,5 +290,30 @@ module.exports = {
         });
       })
       .catch((err) => res.status(500).json(err));
+  },
+
+  getUserByStudentId: (req, res, next) => {
+    const studentID = req.params.studentID.toUpperCase();
+    user.findOne({studentID: studentID}, (err, student) => {
+      if (!student) {
+        const date = new Date();
+        res.status(400).json({
+          success: false,
+          message: 'User is invalid!',
+          data: {
+            code: 400,
+            timestamp: `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+            path: `api/user/${studentID}`,
+            method: 'GET',
+            message: 'User you request is not found',
+          },
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: student,
+      });
+    });
   },
 };

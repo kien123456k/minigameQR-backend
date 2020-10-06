@@ -11,6 +11,7 @@ router.post('/end', user_controller.end);
 
 // router.get('/reset', user_controller.resetToken);
 
+router.get('/:studentID', user_controller.getUserByStudentId);
 router.get('/', user_controller.getUsers);
 
 module.exports = router;
