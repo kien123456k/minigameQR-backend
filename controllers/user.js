@@ -274,22 +274,16 @@ module.exports = {
   },
 
   getUsers: (req, res, next) => {
-    user
-      .aggregate()
-      .sort({score: 'desc', time: 'asc'})
-      .then(async (users) => {
-        for (let i = 1; i <= users.length; i++) {
-          users[i - 1].rank = i;
-          await users[i - 1].save();
-        }
-        res.status(200).json({
-          success: true,
-          data: {
-            user: users,
-          },
-        });
-      })
-      .catch((err) => res.status(500).json(err));
+    // user.find({}).then((users) => {
+    //   res.status(200).json(users);
+    // });
+    user.find({}).sort({score: 'desc', time: 'asc'}, async (users) => {
+      for (let i = 1; i <= users.length; i++) {
+        users[i - 1].rank = i;
+        await users[i - 1].save();
+      }
+      res.status(200).json(users);
+    });
   },
 
   getUserByStudentId: (req, res, next) => {
