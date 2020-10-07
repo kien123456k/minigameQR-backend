@@ -277,13 +277,18 @@ module.exports = {
     // user.find({}).then((users) => {
     //   res.status(200).json(users);
     // });
-    user.find({}).sort({score: 'desc', time: 'asc'}, async (users) => {
-      for (let i = 1; i <= users.length; i++) {
-        users[i - 1].rank = i;
-        await users[i - 1].save();
-      }
-      res.status(200).json(users);
-    });
+
+    user
+      .find({})
+      .sort({score: 'desc', time: 'asc'})
+      .exec(async (err, users) => {
+        let l = users.length;
+        for (let i = 1; i <= l; i++) {
+          users[i - 1].rank = i;
+          await users[i - 1].save();
+        }
+        res.status(200).json(users);
+      });
   },
 
   getUserByStudentId: (req, res, next) => {
@@ -291,7 +296,7 @@ module.exports = {
     user.findOne({studentID: studentID}, (err, student) => {
       if (!student) {
         const date = new Date();
-        res.status(400).json({
+        return res.status(400).json({
           success: false,
           message: 'User is invalid!',
           data: {
