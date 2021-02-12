@@ -8,4 +8,10 @@
   
 * Nguyễn Trần Thiên Đức
   
-* Bùi Ngọc Huy 
+* Bùi Ngọc Huy
+
+## Guide
+You can run this backend by create .env file with the properties like in .env.example then use command
+```
+yarn start
+```
