@@ -11,7 +11,8 @@
 * Bùi Ngọc Huy
 
 ## Guide
-You can run this backend by create .env file with the properties like in .env.example then use command
+You can run this backend by create `.env` file with the content exactly like `.env.example` file then use command 
 ```
 yarn start
 ```
+**Note:** if you want to deploy then replace `http://localhost:27017` with your database URL.
