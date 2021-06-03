@@ -1,7 +1,16 @@
-# Minigame QR Code - BE
+# Minigame QR Code API
 
-## This is a minigame of F-code club for the orientation to welcome K16 of FPT University HCM.
+## Description
+The API for a minigame website of F-code club for the orientation to welcome K16 of FPT University HCM.
 
+Here is [the Frontend](https://github.com/kien123456k/minigameQR-frontend) that using this API.
+## Technology
+- Frontend
+  - React - A JavaScript library for building user interfaces
+  - Ant Design - Design System
+- Backend
+  - Express - Server Core
+  - Mongoose + Mongo - Database
 ## Team Members
 
 * Trần Trung Kiên
@@ -16,3 +25,8 @@ You can run this backend by create `.env` file with the content exactly like `.e
 yarn start
 ```
 **Note:** if you want to deploy then replace `http://localhost:27017` with your database URL.
+
+# License & copyright
+
+© Kirin Tran, FPT University TP.HCM
+Licensed under the [MIT LICENSE](LICENSE).
