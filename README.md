@@ -3,6 +3,8 @@
 ## Description
 The API for a minigame website of F-code club for the orientation to welcome K16 of FPT University HCM.
 
+The player will receive a card with a QR code to have only 1 chance to add name and play.
+
 Here is [the Frontend](https://github.com/kien123456k/minigameQR-frontend) that using this API.
 ## Technology
 - Frontend
@@ -28,5 +30,5 @@ yarn start
 
 # License & copyright
 
-© Kirin Tran, FPT University TP.HCM
+© Kirin Tran - Nguyễn Trần Thiên Đức - Bùi Ngọc Huy, FPT University TP.HCM
 Licensed under the [MIT LICENSE](LICENSE).
